@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from pyccel.stdlib import *
+
 #$ header legendre(int)
 def legendre(p):
     k = p + 1
@@ -66,7 +68,3 @@ def legendre(p):
         w[5] = 0.279705391489276667
         w[6] = 0.129484966168869693
     return x,w
-m = 3
-x,w = legendre(m)
-print(x)
-print(w)
