@@ -1,2 +1,4 @@
-# pyccelext-math
+pyccelext-math
+==============
+
 Pyccel extension for mathematical utilities
