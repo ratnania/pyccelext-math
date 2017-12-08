@@ -3,3 +3,4 @@ __version__ = "0.1"
 
 from .quadratures import *
 from .bsplines    import *
+from .constants   import *
