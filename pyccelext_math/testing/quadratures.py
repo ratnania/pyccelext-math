@@ -1,6 +1,8 @@
 # coding: utf-8
 
-#from pyccelext.math.constants import version
+from pyccelext.math.quadratures import legendre
 
-version = 0
-print('> pyccel math extension version :', version)
+m = 3
+x,w = legendre(m)
+print(x)
+print(w)
