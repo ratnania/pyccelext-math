@@ -1,5 +1,7 @@
 # coding: utf-8
 
+# todo: improve these tests using arrays/lists
+
 from pyccelext.math.external_bsp import spl_compute_greville
 from pyccelext.math.external_bsp import spl_eval_splines_ders
 
