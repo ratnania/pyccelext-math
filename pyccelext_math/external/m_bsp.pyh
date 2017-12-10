@@ -1,0 +1,5 @@
+# example of pyccel headers.
+# this assumes that there is a file '__file__.ext' where
+# ext is one among {c, f, f90, ...}
+
+#$ header function spl_compute_greville(int, int, *double [:]) results(*double [:])

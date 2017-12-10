@@ -1,2 +1,7 @@
 include README.rst
 
+recursive-include pyccelext_math *.f
+recursive-include pyccelext_math *.f90
+recursive-include pyccelext_math *.F90
+recursive-include pyccelext_math *.pyh
+
