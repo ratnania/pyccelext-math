@@ -11,4 +11,3 @@ def test_legendre():
 test_legendre()
 
 print('> PASSED')
-
