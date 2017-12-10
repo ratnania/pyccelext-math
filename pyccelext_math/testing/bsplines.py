@@ -9,10 +9,12 @@ def test_1():
     p = 2
     n = p+n_elements
 
-#    knots = make_knots(n, p)
-#    print(" knots    = ", knots)
-#
-#    greville = make_greville(knots, n, p)
-#    print(" greville = ", greville)
+    knots = make_knots(n, p)
+    print(" knots    = ", knots)
+
+    greville = make_greville(knots, n, p)
+    print(" greville = ", greville)
+
+test_1()
 
 print('> PASSED')
