@@ -8,7 +8,7 @@ def test_legendre():
     print(x)
     print(w)
 
-#test_legendre()
+test_legendre()
 
 print('> PASSED')
 
