@@ -2,7 +2,7 @@
 
 from pyccel.stdlib import *
 
-#$ header legendre(int)
+#$ header legendre(int) results(double [:], double [:])
 def legendre(p):
     k = p + 1
     x = zeros(k, double)

@@ -1,6 +1,6 @@
 # coding: utf-8
 
-#$ header make_knots(int, int)
+#$ header make_knots(int, int) results(double [:])
 def make_knots(n,p):
     n_elements = n-p
     m = n+p+1
@@ -14,7 +14,7 @@ def make_knots(n,p):
         knots[i] = 1.0
     return knots
 
-#$ header make_greville(*double [:], int, int)
+#$ header make_greville(*double [:], int, int) results(double [:])
 def make_greville(knots, n, p):
     greville = zeros(n, double)
     for i in range(0, n):

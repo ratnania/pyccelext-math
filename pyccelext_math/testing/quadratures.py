@@ -2,7 +2,13 @@
 
 from pyccelext.math.quadratures import legendre
 
-m = 3
-x,w = legendre(m)
-print(x)
-print(w)
+def test_legendre():
+    m = 3
+    x,w = legendre(m)
+    print(x)
+    print(w)
+
+#test_legendre()
+
+print('> PASSED')
+
