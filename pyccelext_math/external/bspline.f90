@@ -9,6 +9,9 @@
 !> BSP     : specific implementations for 1D,2D,3D
 !> Externaly, the user should call BSP
 
+! TODO - uncomment spl_refinement_matrix_one_stage and use FindSpan instead of interv from pppack 
+!      - uncomment spl_refinement_matrix_multi_stages  
+
 module m_bspline
 contains
 
@@ -2198,157 +2201,157 @@ contains
   end function pp_cubic
   ! .......................................................
 
-  ! .......................................................
-  !> @brief     computes the refinement matrix corresponding to the insertion of a given knot 
-  !>
-  !> @param[in]    t             knot to be inserted 
-  !> @param[in]    n             number of control points 
-  !> @param[in]    p             spline degree 
-  !> @param[in]    knots         Knot vector 
-  !> @param[out]   mat           refinement matrix 
-  !> @param[out]   knots_new     new Knot vector 
-  subroutine spl_refinement_matrix_one_stage(t, n, p, knots, mat, knots_new)
-  use m_pppack, only : interv 
-  implicit none
-    real(8),               intent(in)    :: t
-    integer,                    intent(in)    :: n
-    integer,                    intent(in)    :: p
-    real(8), dimension(:), intent(in)    :: knots
-    real(8), dimension(:,:), intent(out)    :: mat 
-    real(8), dimension(:), optional, intent(out)    :: knots_new
-    ! local
-    integer :: i 
-    integer :: j
-    integer :: k
-    integer :: i_err
-    real(8) :: alpha
-
-    mat = 0.0d0
-
-    ! ...
-    call interv ( knots, n+p+1, t, k, i_err) 
-    ! ...
-
-    ! ...
-    j = 1
-    call alpha_function(j, k, t, n, p, knots, alpha)
-    mat(j,j) = alpha 
-
-    do j=2, n
-      call alpha_function(j, k, t, n, p, knots, alpha)
-      mat(j,j)   = alpha 
-      mat(j,j-1) = 1.0d0- alpha 
-    end do
-
-    j = n + 1
-    call alpha_function(j, k, t, n, p, knots, alpha)
-    mat(j,j-1) = 1.0d0 - alpha 
-    ! ...
-
-    ! ...
-    if (present(knots_new)) then
-      knots_new = -100000
-      do i = 1, k
-        knots_new(i) = knots(i)
-      end do
-      knots_new(k+1) = t
-      do i = k+1, n+p+1
-        knots_new(i+1) = knots(i)
-      end do
-    end if
-    ! ...
-
-  contains
-    subroutine alpha_function(i, k, t, n, p, knots, alpha)
-    implicit none
-      integer,                    intent(in)    :: i 
-      integer,                    intent(in)    :: k
-      real(8),               intent(in)    :: t
-      integer,                    intent(in)    :: n
-      integer,                    intent(in)    :: p
-      real(8), dimension(:), intent(in)    :: knots
-      real(8),               intent(inout) :: alpha 
-      ! local
-
-      ! ...
-      if (i <= k-p) then
-        alpha = 1.0d0
-      elseif ((k-p < i) .and. (i <= k)) then 
-        alpha = (t - knots(i)) / (knots(i+p) - knots(i))
-      else
-        alpha = 0.0d0
-      end if
-      ! ...
-    end subroutine alpha_function
-
-  end subroutine spl_refinement_matrix_one_stage
-  ! .......................................................
-
-  ! .......................................................
-  !> @brief     computes the refinement matrix corresponding to the insertion of a given list of knots 
-  !>
-  !> @param[in]    ts            array of knots to be inserted 
-  !> @param[in]    n             number of control points 
-  !> @param[in]    p             spline degree 
-  !> @param[in]    knots         Knot vector 
-  !> @param[out]   mat           refinement matrix 
-  subroutine spl_refinement_matrix_multi_stages(ts, n, p, knots, mat)  
-  implicit none
-    real(8), dimension(:),   intent(in)  :: ts
-    integer,                 intent(in)  :: n
-    integer,                 intent(in)  :: p
-    real(8), dimension(:),   intent(in)  :: knots
-    real(8), dimension(:,:), intent(out) :: mat 
-    ! local
-    integer :: i
-    integer :: j 
-    integer :: m 
-    integer :: k 
-    real(8), dimension(:,:), allocatable :: mat_1
-    real(8), dimension(:,:), allocatable :: mat_2
-    real(8), dimension(:,:), allocatable :: mat_stage
-    real(8), dimension(:), allocatable :: knots_1
-    real(8), dimension(:), allocatable :: knots_2
-   
-    m = size(ts,1)
-   
-    allocate(mat_1(n + m, n + m))
-    allocate(mat_2(n + m, n + m))
-    allocate(mat_stage(n + m, n + m))
-   
-    allocate(knots_1(n + p + 1 + m))
-    allocate(knots_2(n + p + 1 + m))
-    
-    ! ... mat is the identity at t=0
-    mat_1 = 0.0d0
-    do i = 1, n
-      mat_1(i,i) = 1.0d0
-    end do
-    ! ...
-   
-    knots_1(1:n+p+1) = knots(1:n+p+1) 
-
-    k = n
-    do i = 1, m
-      call spl_refinement_matrix_one_stage( ts(i), &
-                               & k, &
-                               & p, &
-                               & knots_1, &
-                               & mat_stage, & 
-                               & knots_new=knots_2) 
-   
-      mat_2 = 0.0d0
-      mat_2(1:k+1, 1:n) = matmul(mat_stage(1:k+1, 1:k), mat_1(1:k, 1:n))
-   
-      mat_1(1:k+1, 1:n) = mat_2(1:k+1, 1:n)  
-      
-      k = k + 1
-      knots_1(1:k+p+1) = knots_2(1:k+p+1) 
-    end do
-    mat(1:k, 1:n) = mat_1(1:k, 1:n)  
-
-  end subroutine spl_refinement_matrix_multi_stages
-  ! .......................................................
+!  ! .......................................................
+!  !> @brief     computes the refinement matrix corresponding to the insertion of a given knot 
+!  !>
+!  !> @param[in]    t             knot to be inserted 
+!  !> @param[in]    n             number of control points 
+!  !> @param[in]    p             spline degree 
+!  !> @param[in]    knots         Knot vector 
+!  !> @param[out]   mat           refinement matrix 
+!  !> @param[out]   knots_new     new Knot vector 
+!  subroutine spl_refinement_matrix_one_stage(t, n, p, knots, mat, knots_new)
+!  use m_pppack, only : interv 
+!  implicit none
+!    real(8),               intent(in)    :: t
+!    integer,                    intent(in)    :: n
+!    integer,                    intent(in)    :: p
+!    real(8), dimension(:), intent(in)    :: knots
+!    real(8), dimension(:,:), intent(out)    :: mat 
+!    real(8), dimension(:), optional, intent(out)    :: knots_new
+!    ! local
+!    integer :: i 
+!    integer :: j
+!    integer :: k
+!    integer :: i_err
+!    real(8) :: alpha
+!
+!    mat = 0.0d0
+!
+!    ! ...
+!    call interv ( knots, n+p+1, t, k, i_err) 
+!    ! ...
+!
+!    ! ...
+!    j = 1
+!    call alpha_function(j, k, t, n, p, knots, alpha)
+!    mat(j,j) = alpha 
+!
+!    do j=2, n
+!      call alpha_function(j, k, t, n, p, knots, alpha)
+!      mat(j,j)   = alpha 
+!      mat(j,j-1) = 1.0d0- alpha 
+!    end do
+!
+!    j = n + 1
+!    call alpha_function(j, k, t, n, p, knots, alpha)
+!    mat(j,j-1) = 1.0d0 - alpha 
+!    ! ...
+!
+!    ! ...
+!    if (present(knots_new)) then
+!      knots_new = -100000
+!      do i = 1, k
+!        knots_new(i) = knots(i)
+!      end do
+!      knots_new(k+1) = t
+!      do i = k+1, n+p+1
+!        knots_new(i+1) = knots(i)
+!      end do
+!    end if
+!    ! ...
+!
+!  contains
+!    subroutine alpha_function(i, k, t, n, p, knots, alpha)
+!    implicit none
+!      integer,                    intent(in)    :: i 
+!      integer,                    intent(in)    :: k
+!      real(8),               intent(in)    :: t
+!      integer,                    intent(in)    :: n
+!      integer,                    intent(in)    :: p
+!      real(8), dimension(:), intent(in)    :: knots
+!      real(8),               intent(inout) :: alpha 
+!      ! local
+!
+!      ! ...
+!      if (i <= k-p) then
+!        alpha = 1.0d0
+!      elseif ((k-p < i) .and. (i <= k)) then 
+!        alpha = (t - knots(i)) / (knots(i+p) - knots(i))
+!      else
+!        alpha = 0.0d0
+!      end if
+!      ! ...
+!    end subroutine alpha_function
+!
+!  end subroutine spl_refinement_matrix_one_stage
+!  ! .......................................................
+!
+!  ! .......................................................
+!  !> @brief     computes the refinement matrix corresponding to the insertion of a given list of knots 
+!  !>
+!  !> @param[in]    ts            array of knots to be inserted 
+!  !> @param[in]    n             number of control points 
+!  !> @param[in]    p             spline degree 
+!  !> @param[in]    knots         Knot vector 
+!  !> @param[out]   mat           refinement matrix 
+!  subroutine spl_refinement_matrix_multi_stages(ts, n, p, knots, mat)  
+!  implicit none
+!    real(8), dimension(:),   intent(in)  :: ts
+!    integer,                 intent(in)  :: n
+!    integer,                 intent(in)  :: p
+!    real(8), dimension(:),   intent(in)  :: knots
+!    real(8), dimension(:,:), intent(out) :: mat 
+!    ! local
+!    integer :: i
+!    integer :: j 
+!    integer :: m 
+!    integer :: k 
+!    real(8), dimension(:,:), allocatable :: mat_1
+!    real(8), dimension(:,:), allocatable :: mat_2
+!    real(8), dimension(:,:), allocatable :: mat_stage
+!    real(8), dimension(:), allocatable :: knots_1
+!    real(8), dimension(:), allocatable :: knots_2
+!   
+!    m = size(ts,1)
+!   
+!    allocate(mat_1(n + m, n + m))
+!    allocate(mat_2(n + m, n + m))
+!    allocate(mat_stage(n + m, n + m))
+!   
+!    allocate(knots_1(n + p + 1 + m))
+!    allocate(knots_2(n + p + 1 + m))
+!    
+!    ! ... mat is the identity at t=0
+!    mat_1 = 0.0d0
+!    do i = 1, n
+!      mat_1(i,i) = 1.0d0
+!    end do
+!    ! ...
+!   
+!    knots_1(1:n+p+1) = knots(1:n+p+1) 
+!
+!    k = n
+!    do i = 1, m
+!      call spl_refinement_matrix_one_stage( ts(i), &
+!                               & k, &
+!                               & p, &
+!                               & knots_1, &
+!                               & mat_stage, & 
+!                               & knots_new=knots_2) 
+!   
+!      mat_2 = 0.0d0
+!      mat_2(1:k+1, 1:n) = matmul(mat_stage(1:k+1, 1:k), mat_1(1:k, 1:n))
+!   
+!      mat_1(1:k+1, 1:n) = mat_2(1:k+1, 1:n)  
+!      
+!      k = k + 1
+!      knots_1(1:k+p+1) = knots_2(1:k+p+1) 
+!    end do
+!    mat(1:k, 1:n) = mat_1(1:k, 1:n)  
+!
+!  end subroutine spl_refinement_matrix_multi_stages
+!  ! .......................................................
 
   ! .......................................................
   !> @brief    Computes the derivative matrix for B-Splines 
