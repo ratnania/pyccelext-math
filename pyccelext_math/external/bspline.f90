@@ -234,86 +234,6 @@ contains
   ! .......................................................
 
   ! .......................................................
-  !> @brief      Compute the nonvanishing basis functions and their derivatives.
-  !> @details    First section is A2.2 (The NURBS Book) modified 
-  !>             to store functions and knot differences.  
-  !>
-  !> @param[in]  p           spline degree 
-  !> @param[in]  U           Knot vector 
-  !> @param[in]  uu          Knot array 
-  !> @param[in]  n_points    size of the array uu 
-  !> @param[in]  i span      of a knot 
-  !> @param[in]  n number    of derivatives 
-  !> @param[out] ders        all (p+1) Splines non-vanishing at uu and their derivatives
-  subroutine DersBasisFuns_array(i,uu,n_points,p,n,U,ders)
-    implicit none
-    integer(kind=4), intent(in) :: i, p, n, n_points
-    real   (kind=8), dimension(1:n_points), intent(in) :: uu
-    real   (kind=8), intent(in) :: U(0:i+p)
-    real   (kind=8), intent(out):: ders(0:p,0:n,1:n_points)
-    integer(kind=4) :: j, k, r, s1, s2, rk, pk, j1, j2
-    real   (kind=8), dimension(1:n_points) :: saved
-    real   (kind=8), dimension(1:n_points) :: temp
-    real   (kind=8), dimension(1:n_points) :: d
-    real   (kind=8), dimension(1:p,1:n_points) :: left
-    real   (kind=8), dimension(1:p,1:n_points) :: right
-    real   (kind=8), dimension(0:p,0:p,1:n_points) :: ndu
-    real   (kind=8), dimension(0:1,0:p,1:n_points) :: a
-    ndu(0,0,:) = 1.0
-    do j = 1, p
-       left(j,:)  = uu(:) - U(i+1-j)
-       right(j,:) = U(i+j) - uu(:)
-       saved = 0.0
-       do r = 0, j-1
-          ndu(j,r,:) = right(r+1,:) + left(j-r,:)
-          temp(:) = ndu(r,j-1,:) / ndu(j,r,:)
-          ndu(r,j,:) = saved(:) + right(r+1,:) * temp(:)
-          saved(:) = left(j-r,:) * temp(:)
-       end do
-       ndu(j,j,:) = saved(:)
-    end do
-    ders(:,0,:) = ndu(:,p,:)
-    do r = 0, p
-       s1 = 0; s2 = 1;
-       a(0,0,:) = 1.0
-       do k = 1, n
-          d(:) = 0.0
-          rk = r-k; pk = p-k;
-          if (r >= k) then
-             a(s2,0,:) = a(s1,0,:) / ndu(pk+1,rk,:)
-             d(:) =  a(s2,0,:) * ndu(rk,pk,:)
-          end if
-          if (rk > -1) then
-             j1 = 1
-          else
-             j1 = -rk
-          end if
-          if (r-1 <= pk) then
-             j2 = k-1
-          else
-             j2 = p-r
-          end if
-          do j = j1, j2
-             a(s2,j,:) = (a(s1,j,:) - a(s1,j-1,:)) / ndu(pk+1,rk+j,:)
-             d(:) =  d(:) + a(s2,j,:) * ndu(rk+j,pk,:)
-          end do
-          if (r <= pk) then
-             a(s2,k,:) = - a(s1,k-1,:) / ndu(pk+1,r,:)
-             d(:) =  d(:) + a(s2,k,:) * ndu(r,pk,:)
-          end if
-          ders(r,k,:) = d(:)
-          j = s1; s1 = s2; s2 = j;
-       end do
-    end do
-    r = p
-    do k = 1, n
-       ders(:,k,:) = ders(:,k,:) * r
-       r = r * (p-k)
-    end do
-  end subroutine DersBasisFuns_array 
-  ! .......................................................
-
-  ! .......................................................
   !> @brief     evaluates a B-Spline curve at the knot uu 
   !>
   !> @param[in]    d             dimension of the manifold 
@@ -1085,28 +1005,30 @@ contains
   ! .......................................................
 
   ! .......................................................
-  !> @brief     evaluates all b-splines and their derivatives at given sites 
+  !> @brief     evaluates all b-splines and their derivatives at given sites
   !>
-  !> @param[in]    p           spline degree 
-  !> @param[in]    m           number of control points - 1
-  !> @param[in]    U           Knot vector 
-  !> @param[in]    uu          given sites, contained in the same element 
-  !> @param[in]    n_points    size of uu 
-  !> @param[inout] span        the span index 
-  !> @param[out]   dN          the p+1 non vanishing b-splines and their derivatives at uu 
-  subroutine EvalBasisFunsDers_array(p,m,U,uu,n_points,d,span,dN)
+  !> @param[in]    p     spline degree 
+  !> @param[in]    m     number of control points - 1
+  !> @param[in]    d     number of derivatives
+  !> @param[in]    r     size of tau
+  !> @param[in]    U     Knot vector 
+  !> @param[in]    tau   given knot 
+  !> @param[out]   dN    the p+1 non vanishing b-splines and their derivatives at uu 
+  subroutine spl_eval_splines_ders(p,m,d,r,U,tau,dN)
     use m_pyccelext_math_external_bspline
     implicit none
-    integer(kind=4), intent(in) :: p, m, d, n_points
-    integer(kind=4), intent(inout) :: span
-    real   (kind=8), intent(in) :: U(0:m), uu(1:n_points)
-    real   (kind=8), intent(out):: dN(0:p,0:d,1:n_points)
+    integer(kind=4), intent(in) :: p, m, d, r
+    real   (kind=8), intent(in) :: U(0:m), tau(0:r)
+    real   (kind=8), intent(out):: dN(0:p,0:d,0:r)
+    ! local
+    integer(kind=4) :: span
+    integer(kind=4) :: i
 
-    if (span < 0) then
-       span = FindSpan(m-(p+1),p,uu(1),U)
-    end if
-    call DersBasisFuns_array(span,uu,n_points,p,d,U,dN)
-  end subroutine EvalBasisFunsDers_array 
+    do i = 0, r
+      span = -1
+      call EvalBasisFunsDers(p,m,U,tau(i),d,span,dN(0:p,0:d,i))
+    end do
+  end subroutine spl_eval_splines_ders
   ! .......................................................
 
   ! .......................................................
