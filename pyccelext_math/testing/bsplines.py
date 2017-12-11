@@ -3,7 +3,7 @@
 from pyccelext.math.bsplines import make_knots
 from pyccelext.math.bsplines import make_greville
 
-from pyccelext.math.external_bsp import spl_eval_splines_ders
+from pyccelext.math.external.bsp import spl_eval_splines_ders
 
 def test_1():
     n_elements = 4
