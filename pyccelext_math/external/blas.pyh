@@ -1,0 +1,5 @@
+# pyccel header for BLAS.
+
+#$ __ignore_at_import__ = True
+#$ header function saxpy(int, double, *double [:], int, *double [:], *double [:])
+

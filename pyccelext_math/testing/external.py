@@ -5,6 +5,27 @@
 from pyccelext.math.external.bsp import spl_compute_greville
 from pyccelext.math.external.bsp import spl_eval_splines_ders
 
+#from pyccelext.math.external.blas import saxpy
+#
+#def test_blas_saxpy():
+#    n = 5
+#    sa = 1.0
+#
+#    incx = 1
+#    sx = zeros(n, double)
+#
+#    incy = 1
+#    sy = zeros(n, double)
+#
+#    sx[0] = 1.0
+#    sx[1] = 3.0
+#    sx[3] = 5.0
+#
+#    sy[0] = 2.0
+#    sy[1] = 4.0
+#    sy[3] = 6.0
+#
+#    saxpy(n, sa, sx, incx, sy, incy)
 
 def test_greville():
     n_elements = 4
