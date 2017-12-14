@@ -1,5 +1,7 @@
 # pyccel header for BLAS.
 
-#$ __ignore_at_import__ = True
-#$ header function saxpy(int, double, *double [:], int, *double [:], *double [:])
+__ignore_at_import__ = True
 
+#$ header function saxpy(int, real, *real [:], int, *real [:], *real [:])
+#$ header function daxpy(int, double, *double [:], int, *double [:], *double [:])
+#$ header function caxpy(int, complex, *complex [:], int, *complex [:], *complex [:])
