@@ -2,6 +2,5 @@
 
 __ignore_at_import__ = True
 
-#$ header function saxpy(int, real, *real [:], int, *real [:], *real [:])
+#$ header function saxpy(int, float, *float [:], int, *float [:], *float [:])
 #$ header function daxpy(int, double, *double [:], int, *double [:], *double [:])
-#$ header function caxpy(int, complex, *complex [:], int, *complex [:], *complex [:])
