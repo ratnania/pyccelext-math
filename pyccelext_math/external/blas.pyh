@@ -1,7 +1,0 @@
-# pyccel header for BLAS.
-
-__ignore_at_import__ = True
-__libraries__        = '${BLAS_LIBRARIES}'
-
-#$ header function saxpy(int, float, *float [:], int, *float [:], *float [:])
-#$ header function daxpy(int, double, *double [:], int, *double [:], *double [:])
