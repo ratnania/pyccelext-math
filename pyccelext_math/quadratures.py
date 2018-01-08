@@ -1,6 +1,7 @@
 # coding: utf-8
 
-from pyccel.stdlib import *
+# TODO uncomment this import, must be fixed in construct_tree
+#from pyccel.stdlib import *
 
 #$ header legendre(int) results(double [:], double [:])
 def legendre(p):
