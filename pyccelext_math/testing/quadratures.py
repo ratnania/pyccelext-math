@@ -4,7 +4,11 @@ from pyccelext.math.quadratures import legendre
 
 def test_legendre():
     m = 3
-    x,w = legendre(m)
+
+    # ...
+    [x,w] = legendre(m)
+    # ...
+
     print(x)
     print(w)
 
