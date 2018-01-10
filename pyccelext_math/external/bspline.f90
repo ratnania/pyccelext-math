@@ -12,7 +12,7 @@
 ! TODO - uncomment spl_refinement_matrix_one_stage and use FindSpan instead of interv from pppack 
 !      - uncomment spl_refinement_matrix_multi_stages  
 
-module m_pyccelext_math_external_bspline
+module mod_pyccelext_math_external_bspline
 contains
 
   ! .......................................................
@@ -860,7 +860,7 @@ contains
   end subroutine DegreeElevate
   ! .......................................................
 
-end module m_pyccelext_math_external_bspline
+end module mod_pyccelext_math_external_bspline
 
 
 
@@ -871,9 +871,9 @@ end module m_pyccelext_math_external_bspline
 !> @brief 
 !> Module for Splines 
 !> @details
-!> mostly wrappers for m_pyccelext_math_external_bspline 
-!> the user should use this module and not m_pyccelext_math_external_bspline
-module m_pyccelext_math_external_bsp
+!> mostly wrappers for mod_pyccelext_math_external_bspline 
+!> the user should use this module and not mod_pyccelext_math_external_bspline
+module mod_pyccelext_math_external_bsp
 contains
 
   ! .......................................................
@@ -885,7 +885,7 @@ contains
   !> @param[in] n_elements number of non-zero elements 
   !> @param[in] grid the corresponding grid
   subroutine FindNonZeroElements(p,m,U,n_elements,grid)
-    use m_pyccelext_math_external_bspline, Find => FindNonZeroElements_bspline
+    use mod_pyccelext_math_external_bspline, Find => FindNonZeroElements_bspline
     implicit none
     integer(kind=4), intent(in)  :: p, m
     real   (kind=8), intent(in)  :: U(0:m)
@@ -905,7 +905,7 @@ contains
   !> @param[in] uu given knot 
   !> @param[out] span the span index 
   subroutine FindSpan(p,m,U,uu,span)
-    use m_pyccelext_math_external_bspline, FindS => FindSpan
+    use mod_pyccelext_math_external_bspline, FindS => FindSpan
     implicit none
     integer(kind=4), intent(in)  :: p, m
     real   (kind=8), intent(in)  :: U(0:m), uu
@@ -924,7 +924,7 @@ contains
   !> @param[inout] span  the span index 
   !> @param[out]   mult  multiplicity of the given knot
   subroutine FindMult(p,m,U,uu,span,mult)
-    use m_pyccelext_math_external_bspline, FindM => FindMult
+    use mod_pyccelext_math_external_bspline, FindM => FindMult
     implicit none
     integer(kind=4), intent(in)  :: p, m
     real   (kind=8), intent(in)  :: U(0:m), uu
@@ -947,7 +947,7 @@ contains
   !> @param[in]    uu    given knot 
   !> @param[out]   mult  multiplicity of the given knot
   subroutine FindSpanMult(p,m,U,uu,k,s)
-    use m_pyccelext_math_external_bspline, FindSM => FindSpanMult
+    use mod_pyccelext_math_external_bspline, FindSM => FindSpanMult
     implicit none
     integer(kind=4), intent(in)  :: p, m
     real   (kind=8), intent(in)  :: U(0:m), uu
@@ -966,7 +966,7 @@ contains
   !> @param[inout] span  the span index 
   !> @param[out]   N     the p+1 non vanishing b-splines at uu 
   subroutine EvalBasisFuns(p,m,U,uu,span,N)
-    use m_pyccelext_math_external_bspline
+    use mod_pyccelext_math_external_bspline
     implicit none
     integer(kind=4), intent(in) :: p, m
     integer(kind=4), intent(inout) :: span
@@ -990,7 +990,7 @@ contains
   !> @param[inout] span  the span index 
   !> @param[out]   dN    the p+1 non vanishing b-splines and their derivatives at uu 
   subroutine EvalBasisFunsDers(p,m,U,uu,d,span,dN)
-    use m_pyccelext_math_external_bspline
+    use mod_pyccelext_math_external_bspline
     implicit none
     integer(kind=4), intent(in) :: p, m, d
     integer(kind=4), intent(inout) :: span
@@ -1015,7 +1015,7 @@ contains
   !> @param[in]    tau   given knot 
   !> @param[out]   dN    the p+1 non vanishing b-splines and their derivatives at uu 
   subroutine spl_eval_splines_ders(p,m,d,r,U,tau,dN)
-    use m_pyccelext_math_external_bspline
+    use mod_pyccelext_math_external_bspline
     implicit none
     integer(kind=4), intent(in) :: p, m, d, r
     real   (kind=8), intent(in) :: U(0:m), tau(0:r)
@@ -1087,7 +1087,7 @@ contains
   !> @param[in] V Final Knot vector 
   !> @param[in] Qw Final Control points  
   subroutine InsertKnot(d,n,p,U,Pw,uu,r,V,Qw)
-    use m_pyccelext_math_external_bspline, InsKnt => InsertKnot
+    use mod_pyccelext_math_external_bspline, InsKnt => InsertKnot
     implicit none
     integer(kind=4), intent(in)  :: d
     integer(kind=4), intent(in)  :: n, p
@@ -1121,7 +1121,7 @@ contains
   !> @param[out]   Qw     new control points 
   !> @param[in]    TOL    tolerance for the distance to the control point 
   subroutine RemoveKnot(d,n,p,U,Pw,uu,r,t,V,Qw,TOL)
-    use m_pyccelext_math_external_bspline, RemKnt => RemoveKnot
+    use mod_pyccelext_math_external_bspline, RemKnt => RemoveKnot
     implicit none
     integer(kind=4), intent(in)  :: d
     integer(kind=4), intent(in)  :: n, p
@@ -1158,7 +1158,7 @@ contains
   !> @param[in] V Final Knot vector 
   !> @param[in] Qw Final Control points  
   subroutine Clamp(d,n,p,U,Pw,l,r,V,Qw)
-    use m_pyccelext_math_external_bspline
+    use mod_pyccelext_math_external_bspline
     implicit none
     integer(kind=4), intent(in)  :: d
     integer(kind=4), intent(in)  :: n, p
@@ -1186,7 +1186,7 @@ contains
   !> @param[in] V Final Knot vector 
   !> @param[in] Qw Final Control points  
   subroutine Unclamp(d,n,p,U,Pw,l,r,V,Qw)
-    use m_pyccelext_math_external_bspline
+    use mod_pyccelext_math_external_bspline
     implicit none
     integer(kind=4), intent(in)  :: d
     integer(kind=4), intent(in)  :: n, p
@@ -1214,7 +1214,7 @@ contains
   !> @param[in] Ubar  Final Knot vector 
   !> @param[in] Qw    Final Control points  
   subroutine RefineKnotVector(d,n,p,U,Pw,r,X,Ubar,Qw)
-    use m_pyccelext_math_external_bspline, RefKnt => RefineKnotVector
+    use mod_pyccelext_math_external_bspline, RefKnt => RefineKnotVector
     implicit none
     integer(kind=4), intent(in)  :: d
     integer(kind=4), intent(in)  :: n, p
@@ -1241,7 +1241,7 @@ contains
   !> @param[in] Uh Final Knot vector 
   !> @param[in] Qw Final Control points  
   subroutine DegreeElevate(d,n,p,U,Pw,t,nh,Uh,Qw)
-    use m_pyccelext_math_external_bspline, DegElev => DegreeElevate
+    use mod_pyccelext_math_external_bspline, DegElev => DegreeElevate
     implicit none
     integer(kind=4), intent(in)  :: d
     integer(kind=4), intent(in)  :: n, p
@@ -1266,7 +1266,7 @@ contains
   !> @param[in]    x             knot to evaluate at 
   !> @param[inout] Cw            the point on the curve 
   subroutine Extract(d,n,p,U,Pw,x,Cw)
-    use m_pyccelext_math_external_bspline, CornerCut => CurvePntByCornerCut
+    use mod_pyccelext_math_external_bspline, CornerCut => CurvePntByCornerCut
     implicit none
     integer(kind=4), intent(in)  :: d
     integer(kind=4), intent(in)  :: n, p
@@ -1290,7 +1290,7 @@ contains
   !> @param[in] X the positions on wich evaluation is done  
   !> @param[out] Cw Values  
   subroutine Evaluate1(d,n,p,U,Q,weights,r,X,Cw)
-    use m_pyccelext_math_external_bspline
+    use mod_pyccelext_math_external_bspline
     implicit none
     integer(kind=4), intent(in)  :: d
     integer(kind=4), intent(in)  :: n, p
@@ -1339,7 +1339,7 @@ contains
   !> @param[in] X the positions on wich evaluation is done  
   !> @param[out] Cw Values  
   subroutine EvaluateNormal1(normalize,d,n,p,U,Q,weights,r,X,Cw)
-    use m_pyccelext_math_external_bspline
+    use mod_pyccelext_math_external_bspline
     implicit none
     logical,         intent(in)  :: normalize
     integer(kind=4), intent(in)  :: d
@@ -1398,7 +1398,7 @@ contains
   !> @param[in] X the positions on wich evaluation is done  
   !> @param[out] Cw Values  
   subroutine EvaluateDeriv1(nderiv,N,d,nx,px,U,Q,weights,rx,X,Cw)
-    use m_pyccelext_math_external_bspline
+    use mod_pyccelext_math_external_bspline
     implicit none
     integer(kind=4), intent(in)  :: nderiv
     integer(kind=4), intent(in)  :: N   
@@ -1472,7 +1472,7 @@ contains
   !> @param[in] Y the positions on wich evaluation is done  
   !> @param[out] Cw Values  
   subroutine Evaluate2(d,nx,px,Ux,ny,py,Uy,Q,weights,rx,X,ry,Y,Cw)
-    use m_pyccelext_math_external_bspline
+    use mod_pyccelext_math_external_bspline
     implicit none
     integer(kind=4), intent(in)  :: d
     integer(kind=4), intent(in)  :: nx, ny
@@ -1549,7 +1549,7 @@ contains
   !> @param[out] Cw Values  
   subroutine EvaluateNormal2( normalize_x,normalize_y,&
                             & d,nx,px,Ux,ny,py,Uy,Q,weights,rx,X,ry,Y,Cw)
-    use m_pyccelext_math_external_bspline
+    use mod_pyccelext_math_external_bspline
     implicit none
     logical,         intent(in)  :: normalize_x
     logical,         intent(in)  :: normalize_y
@@ -1644,7 +1644,7 @@ contains
   !> @param[in] Y the positions on wich evaluation is done  
   !> @param[out] Cw Values  
   subroutine EvaluateDeriv2(nderiv,N,d,nx,px,Ux,ny,py,Uy,Q,weights,rx,X,ry,Y,Cw)
-    use m_pyccelext_math_external_bspline
+    use mod_pyccelext_math_external_bspline
     implicit none
     integer(kind=4), intent(in)  :: nderiv
     integer(kind=4), intent(in)  :: N 
@@ -1801,7 +1801,7 @@ contains
   !> @param[in] Z the positions on wich evaluation is done  
   !> @param[out] Cw Values  
   subroutine Evaluate3(d,nx,px,Ux,ny,py,Uy,nz,pz,Uz,Q,weights,rx,X,ry,Y,rz,Z,Cw)
-    use m_pyccelext_math_external_bspline
+    use mod_pyccelext_math_external_bspline
     implicit none
     integer(kind=4), intent(in)  :: d
     integer(kind=4), intent(in)  :: nx, ny, nz
@@ -1895,7 +1895,7 @@ contains
   !> @param[in] Z the positions on wich evaluation is done  
   !> @param[out] Cw Values  
   subroutine EvaluateDeriv3(nderiv,N,d,nx,px,Ux,ny,py,Uy,nz,pz,Uz,Q,weights,rx,X,ry,Y,rz,Z,Cw)
-    use m_pyccelext_math_external_bspline
+    use mod_pyccelext_math_external_bspline
     implicit none
     integer(kind=4), intent(in)  :: nderiv
     integer(kind=4), intent(in)  :: N 
@@ -2348,7 +2348,7 @@ contains
   !> @param[out] mat            mat is a dense matrix of size (n_points, n_points) 
   !>                            where m depends on the boundary condition
   subroutine spl_compute_symbol_stiffness(p, n_points, mat)
-  use m_pyccelext_math_external_bspline, finds => findspan
+  use mod_pyccelext_math_external_bspline, finds => findspan
   implicit none
     integer,                 intent(in)  :: p
     integer,                 intent(in)  :: n_points
@@ -2418,7 +2418,7 @@ contains
   !> @param[out] mat            mat is a dense matrix of size (n_points, n_points) 
   !>                            where m depends on the boundary condition
   subroutine spl_collocation_matrix(n, p, knots, arr_x, mat)
-  use m_pyccelext_math_external_bspline, finds => findspan
+  use mod_pyccelext_math_external_bspline, finds => findspan
   implicit none
     integer,                 intent(in)  :: n
     integer,                 intent(in)  :: p
@@ -2482,7 +2482,7 @@ contains
   !> @param[out] mat       mat is a dense matrix of size (n_points, n_points) 
   !>                       where m depends on the boundary condition
   subroutine spl_collocation_periodic_matrix(r, n, p, knots, arr_x, mat)
-  use m_pyccelext_math_external_bspline, finds => findspan
+  use mod_pyccelext_math_external_bspline, finds => findspan
   implicit none
     integer,                 intent(in)  :: r 
     integer,                 intent(in)  :: n
@@ -2604,4 +2604,4 @@ contains
 
   end subroutine spl_compute_greville
   ! .......................................................
-end module m_pyccelext_math_external_bsp
+end module mod_pyccelext_math_external_bsp
