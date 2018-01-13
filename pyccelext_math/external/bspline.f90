@@ -2604,4 +2604,45 @@ contains
 
   end subroutine spl_compute_greville
   ! .......................................................
+
+  ! .......................................................
+  !> @brief     computes span index for every element 
+  !>
+  !> @param[in]    n               number of control points
+  !> @param[in]    p               spline degree 
+  !> @param[in]    knots           Knot vector 
+  !> @param[out]   elements_spans  Knot vector 
+  subroutine spl_compute_spans(p, n, knots, elements_spans, basis_elements)
+  implicit none
+    integer,                    intent(in)  :: n
+    integer,                    intent(in)  :: p
+    real(kind=8), dimension(:), intent(in)  :: knots
+    integer,      dimension(:), intent(out) :: elements_spans
+    integer,      dimension(:), intent(out) :: basis_elements
+    ! local variables
+    integer :: i_element
+    integer :: i_knot
+
+    ! ...
+    elements_spans = -1 
+    basis_elements = -1 
+    ! ...
+
+    ! ...
+    i_element = 0
+    do i_knot = p + 1, n 
+      basis_elements(i_knot) = i_element
+
+      ! we check if the element has zero measure
+      if ( knots(i_knot) /= knots(i_knot + 1) ) then
+        i_element = i_element + 1
+        
+        elements_spans(i_element) = i_knot
+      end if
+    end do
+    ! ...
+     
+  end subroutine spl_compute_spans 
+  ! .......................................................
+
 end module mod_pyccelext_math_external_bsp
