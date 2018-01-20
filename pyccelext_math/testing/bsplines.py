@@ -18,12 +18,9 @@ def test_1():
     print(" greville = ", greville)
 
     spans = zeros(n_elements, int)
-    basis_elements = zeros(n, int)
 
-    # ... subroutine call
-    [spans, basis_elements] = spl_compute_spans(p, n, knots)
+    spans = spl_compute_spans(p, n, knots)
     print(" spans = ", spans)
-    print(" basis_elements = ", basis_elements)
 
 
 def test_2():

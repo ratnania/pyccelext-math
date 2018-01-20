@@ -2585,6 +2585,44 @@ contains
   end subroutine spl_symetrize_knots
   ! .......................................................
 
+  ! ........................................ 
+  !> @brief     creates an open knot vector on the interval [0, 1]
+  !>
+  !> @param[in]    n       number of control points
+  !> @param[in]    p       spline degree 
+  !> @param[out]   knots   Knot vector 
+  subroutine spl_make_open_knots(n, p, knots)
+    implicit none
+    integer, intent(in)  :: p
+    integer, intent(in)  :: n
+    real(kind=8), dimension(:), intent(out) :: knots
+    ! local
+    integer :: n_elements
+    integer :: i
+    integer :: i_b
+    integer :: i_e
+
+    i_b = lbound(knots, 1)
+    i_e = ubound(knots, 1)
+
+    n_elements = n - p
+
+    knots = 0.0
+    do i = i_b, i_b + p, 1
+      knots(i) = 0.0d0
+    end do
+
+    do i = i_b + 1 + p, i_b + n, 1
+      knots(i) = (i - i_b - p)*1.0d0/n_elements
+    end do
+
+    do i = i_b + 1 + n, i_b + n + p, 1
+      knots(i) = 1.0d0
+    end do
+
+  end subroutine spl_make_open_knots
+  ! ........................................ 
+
   ! .......................................................
   !> @brief     returns the Greville abscissae 
   !>
@@ -2612,27 +2650,30 @@ contains
   !> @param[in]    p               spline degree 
   !> @param[in]    knots           Knot vector 
   !> @param[out]   elements_spans  Knot vector 
-  subroutine spl_compute_spans(p, n, knots, elements_spans, basis_elements)
+  subroutine spl_compute_spans(p, n, knots, elements_spans)
   implicit none
     integer,                    intent(in)  :: n
     integer,                    intent(in)  :: p
     real(kind=8), dimension(:), intent(in)  :: knots
     integer,      dimension(:), intent(out) :: elements_spans
-    integer,      dimension(:), intent(out) :: basis_elements
     ! local variables
     integer :: i_element
     integer :: i_knot
+    integer :: i_b
+    integer :: i_e
 
     ! ...
     elements_spans = -1 
-    basis_elements = -1 
+    ! ...
+
+    ! ...
+    i_b = lbound(knots, 1)
+    i_e = ubound(knots, 1)
     ! ...
 
     ! ...
     i_element = 0
-    do i_knot = p + 1, n 
-      basis_elements(i_knot) = i_element
-
+    do i_knot = i_b, i_e - p - 1 
       ! we check if the element has zero measure
       if ( knots(i_knot) /= knots(i_knot + 1) ) then
         i_element = i_element + 1
@@ -2644,5 +2685,140 @@ contains
      
   end subroutine spl_compute_spans 
   ! .......................................................
+
+  ! ........................................ 
+  !> @brief     constructs a grid from knots vector 
+  !>
+  !> @param[in]    p       spline degree 
+  !> @param[in]    knots   Knot vector 
+  !> @param[out]   grid    array containing the grid 
+  subroutine spl_construct_grid_from_knots(p, knots, grid)
+    implicit none
+    integer, intent(in)  :: p
+    real(kind=8), dimension(:), intent(in)  :: knots
+    real(kind=8), dimension(:), intent(out) :: grid
+    ! local
+    integer :: i
+    integer :: i_b
+    integer :: i_e
+
+    ! ...
+    i_b = lbound(grid, 1)
+    i_e = ubound(grid, 1)
+    ! ...
+
+    grid = 0.0
+    do i = i_b, i_e, 1
+      grid(i) = knots(i + p)
+    end do
+
+  end subroutine spl_construct_grid_from_knots
+  ! ........................................ 
+
+  ! ........................................ 
+  !> @brief     constructs the quadrature grid
+  !>
+  !> @param[in]    u        array containing the quadrature rule points on [-1, 1]
+  !> @param[in]    w        array containing the quadrature rule weights on [-1, 1] 
+  !> @param[in]    grid     array containing the grid 
+  !> @param[out]   points   array containing for each element, all quad points
+  !> @param[out]   weights  array containing for each element, all quad weights
+  subroutine spl_construct_quadrature_grid(u, w, grid, points, weights)
+    implicit none
+    real(kind=8), dimension(:), intent(in) :: u
+    real(kind=8), dimension(:), intent(in) :: w
+    real(kind=8), dimension(:), intent(in) :: grid 
+    real(kind=8), dimension(:,:), intent(out) :: points
+    real(kind=8), dimension(:,:), intent(out) :: weights
+    ! local
+    integer :: i_b
+    integer :: i_e
+    integer :: k_b
+    integer :: k_e
+    integer :: i_element
+    integer :: i_point
+    real(kind=8) :: a
+    real(kind=8) :: b
+    real(kind=8) :: half
+
+    ! ...
+    i_b = lbound(grid, 1)
+    i_e = ubound(grid, 1)
+
+    k_b = lbound(u, 1)
+    k_e = ubound(u, 1)
+    ! ...
+
+    points  = 0.0
+    weights = 0.0
+
+    do i_element = i_b, -1 + i_e, 1
+      a = grid(i_element)
+      b = grid(i_element + 1)
+      half = 0.5d0*(-a + b)
+
+      do i_point = k_b, k_e, 1
+        points(i_point, i_element) = (u(i_point) + 1.0d0)*half + a
+        weights(i_point, i_element) = w(i_point)*half
+      end do
+    end do
+
+  end subroutine spl_construct_quadrature_grid
+  ! ........................................ 
+
+  ! ........................................ 
+  !> @brief     evaluates all splines on a quad grid 
+  !>
+  !> @param[in]    n       number of control points
+  !> @param[in]    p       spline degree 
+  !> @param[in]    d       number of derivatives 
+  !> @param[in]    knots   Knot vector 
+  !> @param[in]    points  array containing for each element, all quad points
+  !> @param[out]   basis   array containing the evaluation of splines for every element 
+  subroutine spl_eval_on_grid_splines_ders(n, p, d, knots, points, basis)
+    implicit none
+    integer, intent(in) :: n
+    integer, intent(in) :: p
+    integer, intent(in) :: d
+    real(kind=8), dimension(:), intent(in)  :: knots
+    real(kind=8), dimension(:,:), intent(in) :: points
+    real(kind=8), dimension(:,:,:,:), intent(out) :: basis
+    ! local
+    integer :: i_element
+    integer :: i_b
+    integer :: i_e
+    integer :: k
+    real(kind=8), dimension(:,:,:), allocatable :: dN
+
+!    basis_1(0:p, 0:d, 0:k-1, 0:n_elements-1)
+
+    ! ...
+    i_b = lbound(points, 2)
+    i_e = ubound(points, 2)
+
+    k = ubound(points, 1) - lbound(points, 1) + 1
+    ! ...
+
+    ! ...
+    allocate(dN(0:p,0:d,0:k-1))
+    ! ...
+
+    ! ...
+    basis = 0.0d0
+    do i_element = i_b, i_e, 1
+      dN = 0.0d0
+      call spl_eval_splines_ders( p, n, d, k-1, knots, &
+                                & points(:,i_element), &
+                                & dN)
+      basis(:,:,:,i_element) = dN(0:p,0:d,0:k-1)
+    end do
+    ! ...
+
+    ! ...
+    deallocate(dN)
+    ! ...
+
+  end subroutine spl_eval_on_grid_splines_ders
+  ! ........................................ 
 
 end module mod_pyccelext_math_external_bsp

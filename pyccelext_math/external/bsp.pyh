@@ -1,3 +1,7 @@
 #$ header function spl_compute_greville(int, int, double [:]) results(double [:])
+#$ header function spl_make_open_knots(int, int) results(double [:])
 #$ header function spl_eval_splines_ders(int, int, int, int, double [:], double [:]) results(double [:,:,:])
-#$ header function spl_compute_spans(int, int, double [:]) results(int [:], int [:])
+#$ header function spl_compute_spans(int, int, double [:]) results(int [:])
+#$ header function spl_construct_grid_from_knots(int, double [:]) results(double [:])
+#$ header function spl_construct_quadrature_grid(double [:], double [:], double [:]) results(double [:,:], double [:,:])
+#$ header function spl_eval_on_grid_splines_ders(int, int, int, double [:], double [:,:]) results(double [:,:,:,:])
