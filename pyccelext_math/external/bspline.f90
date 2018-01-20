@@ -2689,12 +2689,16 @@ contains
   ! ........................................ 
   !> @brief     constructs a grid from knots vector 
   !>
-  !> @param[in]    p       spline degree 
-  !> @param[in]    knots   Knot vector 
-  !> @param[out]   grid    array containing the grid 
-  subroutine spl_construct_grid_from_knots(p, knots, grid)
+  !> @param[in]    p            spline degree 
+  !> @param[in]    n            number of control points
+  !> @param[in]    n_elements   number of elements
+  !> @param[in]    knots        knot vector 
+  !> @param[out]   grid         array containing the grid 
+  subroutine spl_construct_grid_from_knots(p, n, n_elements, knots, grid)
     implicit none
     integer, intent(in)  :: p
+    integer, intent(in)  :: n
+    integer, intent(in)  :: n_elements
     real(kind=8), dimension(:), intent(in)  :: knots
     real(kind=8), dimension(:), intent(out) :: grid
     ! local
@@ -2703,14 +2707,16 @@ contains
     integer :: i_e
 
     ! ...
-    i_b = lbound(grid, 1)
-    i_e = ubound(grid, 1)
+    i_b = lbound(knots, 1)
+    i_e = ubound(knots, 1)
     ! ...
 
+    ! ...
     grid = 0.0
-    do i = i_b, i_e, 1
+    do i = i_b, i_b+n_elements, 1
       grid(i) = knots(i + p)
     end do
+    ! ...
 
   end subroutine spl_construct_grid_from_knots
   ! ........................................ 
@@ -2807,7 +2813,7 @@ contains
     basis = 0.0d0
     do i_element = i_b, i_e, 1
       dN = 0.0d0
-      call spl_eval_splines_ders( p, n, d, k-1, knots, &
+      call spl_eval_splines_ders( p, n+p, d, k-1, knots, &
                                 & points(:,i_element), &
                                 & dN)
       basis(:,:,:,i_element) = dN(0:p,0:d,0:k-1)
