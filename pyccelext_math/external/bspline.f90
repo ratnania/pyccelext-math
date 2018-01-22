@@ -2686,6 +2686,49 @@ contains
   end subroutine spl_compute_spans 
   ! .......................................................
 
+  ! .......................................................
+  !> @brief     computes the origin element of all splines
+  !>
+  !> @param[in]    n                number of control points
+  !> @param[in]    p                spline degree 
+  !> @param[in]    knots            Knot vector 
+  !> @param[out]   origins_element  Knot vector 
+  subroutine spl_compute_origins_element(p, n, knots, origins_element)
+  implicit none
+    integer,                    intent(in)  :: n
+    integer,                    intent(in)  :: p
+    real(kind=8), dimension(:), intent(in)  :: knots
+    integer,      dimension(:), intent(out) :: origins_element
+    ! local variables
+    integer :: i_element
+    integer :: i_knot
+    integer :: i_b
+    integer :: i_e
+
+    ! ...
+    origins_element = -1 
+    ! ...
+
+    ! ...
+    i_b = lbound(knots, 1)
+    i_e = ubound(knots, 1)
+    ! ...
+
+    ! ...
+    i_element = 0
+    do i_knot = i_b, i_e - p - 1 
+      origins_element(i_knot) = i_element
+
+      ! we check if the element has zero measure
+      if ( knots(i_knot) /= knots(i_knot + 1) ) then
+        i_element = i_element + 1
+      end if
+    end do
+    ! ...
+     
+  end subroutine spl_compute_origins_element
+  ! .......................................................
+
   ! ........................................ 
   !> @brief     constructs a grid from knots vector 
   !>
